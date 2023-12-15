@@ -1,0 +1,81 @@
+import random
+def receipt_decorator(func):
+    def wrapper(*args, **kwargs):
+        order_info = func(*args, **kwargs)
+
+        print("---------- Чек ----------")
+        print("Столовая <Уют>")
+        print("--------------------------")
+        print(f"Заказ: {order_info['order_number']}")
+        print(f"Дата: {order_info['date']}")
+        print("--------------------------")
+        for item in order_info['items']:
+            print(f"{item['name']}: ₽{item['price']}")
+        print("--------------------------")
+        print(f"Общая стоимость: ₽{order_info['total_price']}")
+        print("--------------------------")
+
+        return order_info
+
+    return wrapper
+
+
+@receipt_decorator
+def place_order(user, cart):
+    order_number = random.randint(1, 999)
+    date = "31.12.2023"
+    total_price = sum(item['price'] for item in cart)
+
+    order_info = {
+        'order_number': order_number,
+        'date': date,
+        'items': cart,
+        'total_price': total_price
+    }
+
+    return order_info
+
+
+def register_user():
+    name = input("Введите ваше имя: ")
+    return name
+
+
+def display_menu(menu):
+    print("Меню:")
+    for i, item in enumerate(menu, start=1):
+        print(f"{i}. {item['name']}: ₽{item['price']}")
+
+
+def create_order(menu):
+    cart = []
+    display_menu(menu)
+    while True:
+        choice = input("Выберите блюдо (номер пункта меню) или введите 'стоп' для завершения заказа: ")
+        if choice == 'стоп':
+            print("Галя, отмена!")
+            break
+        try:
+            choice = int(choice)
+            if 1 <= choice <= len(menu):
+                item = menu[choice - 1]
+                cart.append(item)
+                print(f"{item['name']} добавлен на поднос.")
+            else:
+                print("Если вас били асфальтом - идите к врачу. Попробуйте снова.")
+        except ValueError:
+            print("Если вас били асфальтом - идите к врачу. Попробуйте снова.")
+    return cart
+
+menu = [
+    {"name": "Пюре картофельное <Сказка>", "price": 65},
+    {"name": "Котлета по-киевски <Счастье>", "price": 70},
+    {"name": "Сосиска <Ромашка>", "price": 53},
+    {"name": "Чай чёрный <Принцесса Нури>", "price": 42},
+    {"name": "Кофе 3в1 <Жокей>", "price": 15},
+    {"name": "Апельсиновый сок", "price": 47}
+]
+
+user = register_user()
+order_cart = create_order(menu)
+order_info = place_order(user, order_cart)
